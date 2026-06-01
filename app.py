@@ -1,17 +1,17 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 import pymysql
-
+import os
 app = Flask(__name__)
-app.secret_key = "health_checkin_secret_key"
+app.secret_key = os.getenv("SECRET_KEY", "health_checkin_secret_key")
 
 def get_db_connection():
-    """连接 MySQL 数据库"""
+    """连接 MySQL 数据库：本地运行用默认值，部署到 Railway 后自动读取环境变量"""
     return pymysql.connect(
-        host="localhost",
-        port=3306,
-        user="checkin_user",
-        password="Checkin@123456",
-        database="health_checkin_db",
+        host=os.getenv("MYSQLHOST", "localhost"),
+        port=int(os.getenv("MYSQLPORT", "3306")),
+        user=os.getenv("MYSQLUSER", "checkin_user"),
+        password=os.getenv("MYSQLPASSWORD", "Checkin@123456"),
+        database=os.getenv("MYSQLDATABASE", "health_checkin_db"),
         charset="utf8mb4",
         cursorclass=pymysql.cursors.DictCursor
     )
