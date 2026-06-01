@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, session, url_for
 import pymysql
 import os
 import smtplib
+import requests
 from email.message import EmailMessage
 from email.header import Header
 from email.utils import formataddr
@@ -21,29 +22,39 @@ def get_db_connection():
     )
 
 def send_email(to_email, subject, content):
-    """发送邮件提醒"""
-    email_host = os.getenv("EMAIL_HOST")
-    email_port = int(os.getenv("EMAIL_PORT", "465"))
-    email_user = os.getenv("EMAIL_USER")
-    email_password = os.getenv("EMAIL_PASSWORD")
-    email_sender_name = os.getenv("EMAIL_SENDER_NAME", "健康打卡系统")
+    """使用 Resend API 发送邮件提醒"""
+    resend_api_key = os.getenv("RESEND_API_KEY")
+    email_from = os.getenv("EMAIL_FROM", "健康打卡系统 <onboarding@resend.dev>")
 
-    if not email_host or not email_user or not email_password:
-        raise RuntimeError("邮件发送配置不完整，请检查 EMAIL_HOST、EMAIL_USER、EMAIL_PASSWORD")
+    if not resend_api_key:
+        raise RuntimeError("邮件发送配置不完整，请检查 RESEND_API_KEY")
 
     if not to_email:
         raise RuntimeError("收件人邮箱为空，无法发送邮件")
 
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = f"{email_sender_name} <{email_user}>"
-    msg["To"] = to_email
-    msg.set_content(content)
+    html_content = content.replace("\n", "<br>")
 
-    # timeout=5：防止 Railway 云端连接 QQ SMTP 端口时长时间卡死
-    with smtplib.SMTP_SSL(email_host, email_port, timeout=5) as smtp:
-        smtp.login(email_user, email_password)
-        smtp.send_message(msg)
+    response = requests.post(
+        "https://api.resend.com/emails",
+        headers={
+            "Authorization": f"Bearer {resend_api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "health-checkin-app/1.0"
+        },
+        json={
+            "from": email_from,
+            "to": [to_email],
+            "subject": subject,
+            "html": html_content,
+            "text": content
+        },
+        timeout=10
+    )
+
+    if response.status_code >= 400:
+        raise RuntimeError(f"Resend API 发送失败：{response.status_code} {response.text}")
+
+    return response.json()
 
 def get_count(cursor, table_name):
     """查询某张表的数据总数"""
