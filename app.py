@@ -35,12 +35,13 @@ def send_email(to_email, subject, content):
         raise RuntimeError("收件人邮箱为空，无法发送邮件")
 
     msg = EmailMessage()
-    msg["Subject"] = str(Header(subject, "utf-8"))
-    msg["From"] = formataddr((str(Header(email_sender_name, "utf-8")), email_user))
+    msg["Subject"] = subject
+    msg["From"] = f"{email_sender_name} <{email_user}>"
     msg["To"] = to_email
-    msg.set_content(content, charset="utf-8")
+    msg.set_content(content)
 
-    with smtplib.SMTP_SSL(email_host, email_port, timeout=20) as smtp:
+    # timeout=5：防止 Railway 云端连接 QQ SMTP 端口时长时间卡死
+    with smtplib.SMTP_SSL(email_host, email_port, timeout=5) as smtp:
         smtp.login(email_user, email_password)
         smtp.send_message(msg)
 
