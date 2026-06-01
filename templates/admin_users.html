@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>用户总览</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+        .header {
+            background: linear-gradient(135deg, #4f8cff, #35c2a1);
+            color: white;
+            padding: 26px 50px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+        .container {
+            padding: 30px 50px;
+        }
+        .panel {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .back {
+            text-decoration: none;
+            color: #2f6fed;
+            font-weight: bold;
+            background: #eef4ff;
+            padding: 9px 14px;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+        }
+        th {
+            background: #f0f5ff;
+            color: #333;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background: #f9fbff;
+        }
+        .tag {
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            background: #eef4ff;
+            color: #2f6fed;
+        }
+        .admin {
+            background: #fff6e6;
+            color: #d98200;
+        }
+        .normal {
+            background: #e9f8f0;
+            color: #1f9d55;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>用户总览</h1>
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <div class="top-bar">
+                <h2>系统注册用户信息</h2>
+                <a class="back" href="/">返回首页</a>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>用户编号</th>
+                        <th>用户名</th>
+                        <th>注册手机号</th>
+                        <th>性别</th>
+                        <th>年龄</th>
+                        <th>角色</th>
+                        <th>账号状态</th>
+                        <th>注册时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ user.user_id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.phone }}</td>
+                        <td>{{ user.gender }}</td>
+                        <td>{{ user.age }}</td>
+                        <td>
+                            {% if user.role == '管理员' %}
+                                <span class="tag admin">{{ user.role }}</span>
+                            {% else %}
+                                <span class="tag">{{ user.role }}</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="tag normal">{{ user.status }}</span></td>
+                        <td>{{ user.register_time }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

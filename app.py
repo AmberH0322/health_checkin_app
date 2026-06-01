@@ -690,5 +690,37 @@ def admin_home():
 
     finally:
         conn.close()
+@app.route("/admin/users")
+def admin_users():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if session.get("role") != "管理员":
+        return "无权限访问管理员页面"
+
+    conn = get_db_connection()
+
+    try:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT
+                    user_id,
+                    username,
+                    phone,
+                    gender,
+                    age,
+                    role,
+                    status,
+                    register_time
+                FROM t_user
+                ORDER BY user_id;
+            """
+            cursor.execute(sql)
+            user_list = cursor.fetchall()
+
+        return render_template("admin_users.html", users=user_list)
+
+    finally:
+        conn.close()
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
