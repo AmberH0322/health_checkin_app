@@ -79,6 +79,36 @@
         .empty {
             color: #999;
         }
+        .btn-email {
+    border: none;
+    padding: 7px 11px;
+    border-radius: 8px;
+    background: #2f6fed;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-email:hover {
+    background: #245bd0;
+}
+
+.btn-disabled {
+    padding: 7px 11px;
+    border-radius: 8px;
+    background: #eee;
+    color: #999;
+    font-size: 13px;
+}
+
+.msg {
+    margin-bottom: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #e9f8f0;
+    color: #1f9d55;
+    font-weight: bold;
+}
     </style>
 </head>
 <body>
@@ -92,7 +122,9 @@
                 <h2>异常提醒与紧急联系人通知</h2>
                 <a class="back" href="/">返回首页</a>
             </div>
-
+{% if message %}
+    <div class="msg">{{ message }}</div>
+{% endif %}
             <table>
                 <thead>
                     <tr>
@@ -105,50 +137,80 @@
                         <th>处理状态</th>
                         <th>紧急联系人</th>
                         <th>关系</th>
+                        <th>通知方式</th>
                         <th>通知状态</th>
-                        <th>通知时间</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for alert in alerts %}
-                    <tr>
-                        <td>{{ alert.alert_id }}</td>
-                        <td>{{ alert.username }}</td>
-                        <td>{{ alert.type_name }}</td>
-                        <td>{{ alert.task_name }}</td>
-                        <td><span class="alert-tag">{{ alert.alert_type }}</span></td>
-                        <td>{{ alert.alert_date }}</td>
-                        <td>{{ alert.handle_status }}</td>
-                        <td>
-                            {% if alert.contact_name %}
-                                {{ alert.contact_name }}
-                            {% else %}
-                                <span class="empty">无</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if alert.relationship %}
-                                {{ alert.relationship }}
-                            {% else %}
-                                <span class="empty">无</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if alert.notify_status %}
-                                <span class="notify-tag">{{ alert.notify_status }}</span>
-                            {% else %}
-                                <span class="empty">不通知</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if alert.notify_time %}
-                                {{ alert.notify_time }}
-                            {% else %}
-                                <span class="empty">-</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
+{% for alert in alerts %}
+<tr>
+    <td>{{ alert.alert_id }}</td>
+    <td>{{ alert.username }}</td>
+    <td>{{ alert.type_name }}</td>
+    <td>{{ alert.task_name }}</td>
+    <td><span class="alert-tag">{{ alert.alert_type }}</span></td>
+    <td>{{ alert.alert_date }}</td>
+    <td>{{ alert.handle_status }}</td>
+
+    <td>
+        {% if alert.contact_name %}
+            {{ alert.contact_name }}
+        {% else %}
+            <span class="empty">无</span>
+        {% endif %}
+    </td>
+
+    <td>
+        {% if alert.relationship %}
+            {{ alert.relationship }}
+        {% else %}
+            <span class="empty">无</span>
+        {% endif %}
+    </td>
+
+    <td>
+        {% if alert.email %}
+            {{ alert.email }}
+        {% else %}
+            <span class="empty">无邮箱</span>
+        {% endif %}
+    </td>
+
+    <td>
+        {% if alert.notify_method %}
+            {{ alert.notify_method }}
+        {% else %}
+            <span class="empty">不通知</span>
+        {% endif %}
+    </td>
+
+    <td>
+        {% if alert.notify_status %}
+            <span class="notify-tag">{{ alert.notify_status }}</span>
+        {% else %}
+            <span class="empty">无</span>
+        {% endif %}
+    </td>
+
+    <td>
+        {% if alert.notify_time %}
+            {{ alert.notify_time }}
+        {% else %}
+            <span class="empty">-</span>
+        {% endif %}
+    </td>
+
+    <td>
+        {% if alert.notify_id and alert.email %}
+            <form method="post" action="/admin/send_email/{{ alert.notify_id }}">
+                <button class="btn-email" type="submit">发送邮件</button>
+            </form>
+        {% else %}
+            <span class="btn-disabled">不可发送</span>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
                 </tbody>
             </table>
         </div>

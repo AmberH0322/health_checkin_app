@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 import pymysql
 import os
+import smtplib
+from email.message import EmailMessage
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "health_checkin_secret_key")
 
@@ -16,6 +18,26 @@ def get_db_connection():
         cursorclass=pymysql.cursors.DictCursor
     )
 
+def send_email(to_email, subject, content):
+    """发送邮件提醒"""
+    email_host = os.getenv("EMAIL_HOST")
+    email_port = int(os.getenv("EMAIL_PORT", "465"))
+    email_user = os.getenv("EMAIL_USER")
+    email_password = os.getenv("EMAIL_PASSWORD")
+    email_sender_name = os.getenv("EMAIL_SENDER_NAME", "健康打卡系统")
+
+    if not email_host or not email_user or not email_password:
+        raise RuntimeError("邮件发送配置不完整，请检查 EMAIL_HOST、EMAIL_USER、EMAIL_PASSWORD")
+
+    msg = EmailMessage()
+    msg["Subject"] = subject
+    msg["From"] = f"{email_sender_name} <{email_user}>"
+    msg["To"] = to_email
+    msg.set_content(content)
+
+    with smtplib.SMTP_SSL(email_host, email_port) as smtp:
+        smtp.login(email_user, email_password)
+        smtp.send_message(msg)
 
 def get_count(cursor, table_name):
     """查询某张表的数据总数"""
@@ -137,6 +159,14 @@ def statistics():
         conn.close()
 @app.route("/alerts")
 def alerts():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if session.get("role") != "管理员":
+        return "无权限访问管理员页面"
+
+    message = request.args.get("message")
+
     conn = get_db_connection()
 
     try:
@@ -149,9 +179,13 @@ def alerts():
                     t.task_name,
                     a.alert_type,
                     a.alert_date,
+                    a.alert_content,
                     a.handle_status,
+                    n.notify_id,
                     e.contact_name,
                     e.relationship,
+                    e.email,
+                    n.notify_method,
                     n.notify_status,
                     n.notify_time
                 FROM t_alert_record a
@@ -165,7 +199,11 @@ def alerts():
             cursor.execute(sql)
             alert_list = cursor.fetchall()
 
-        return render_template("alerts.html", alerts=alert_list)
+        return render_template(
+            "alerts.html",
+            alerts=alert_list,
+            message=message
+        )
 
     finally:
         conn.close()
@@ -719,6 +757,92 @@ def admin_users():
             user_list = cursor.fetchall()
 
         return render_template("admin_users.html", users=user_list)
+
+    finally:
+        conn.close()
+@app.route("/admin/send_email/<int:notify_id>", methods=["POST"])
+def admin_send_email(notify_id):
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if session.get("role") != "管理员":
+        return "无权限访问管理员页面"
+
+    conn = get_db_connection()
+
+    try:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT
+                    n.notify_id,
+                    n.notify_content,
+                    e.contact_name,
+                    e.email,
+                    u.username,
+                    c.type_name,
+                    t.task_name
+                FROM t_alert_notify_record n
+                JOIN t_alert_record a ON n.alert_id = a.alert_id
+                JOIN t_checkin_task t ON a.task_id = t.task_id
+                JOIN t_user u ON t.user_id = u.user_id
+                JOIN t_checkin_type c ON t.type_id = c.type_id
+                JOIN t_emergency_contact e ON n.contact_id = e.contact_id
+                WHERE n.notify_id = %s;
+            """
+            cursor.execute(sql, (notify_id,))
+            notify = cursor.fetchone()
+
+            if not notify:
+                return redirect(url_for("alerts", message="通知记录不存在"))
+
+            if not notify["email"]:
+                return redirect(url_for("alerts", message="该紧急联系人未填写邮箱，无法发送邮件"))
+
+            subject = f"健康打卡异常提醒：{notify['task_name']}"
+
+            content = f"""您好，{notify['contact_name']}：
+
+系统检测到用户 {notify['username']} 的打卡任务出现异常。
+
+打卡类型：{notify['type_name']}
+任务名称：{notify['task_name']}
+
+异常提醒内容：
+{notify['notify_content']}
+
+请及时联系用户确认情况。
+
+—— 多场景个性化健康生活打卡管理系统
+"""
+
+            try:
+                send_email(
+                    notify["email"],
+                    subject,
+                    content
+                )
+
+                cursor.execute("""
+                    UPDATE t_alert_notify_record
+                    SET notify_method = '邮件提醒',
+                        notify_status = '已发送',
+                        notify_time = NOW()
+                    WHERE notify_id = %s;
+                """, (notify_id,))
+                conn.commit()
+
+                return redirect(url_for("alerts", message="邮件提醒发送成功"))
+
+            except Exception as e:
+                cursor.execute("""
+                    UPDATE t_alert_notify_record
+                    SET notify_method = '邮件提醒',
+                        notify_status = '发送失败'
+                    WHERE notify_id = %s;
+                """, (notify_id,))
+                conn.commit()
+
+                return redirect(url_for("alerts", message=f"邮件发送失败：{e}"))
 
     finally:
         conn.close()
