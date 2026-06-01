@@ -3,6 +3,8 @@ import pymysql
 import os
 import smtplib
 from email.message import EmailMessage
+from email.header import Header
+from email.utils import formataddr
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "health_checkin_secret_key")
 
@@ -29,13 +31,16 @@ def send_email(to_email, subject, content):
     if not email_host or not email_user or not email_password:
         raise RuntimeError("邮件发送配置不完整，请检查 EMAIL_HOST、EMAIL_USER、EMAIL_PASSWORD")
 
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = f"{email_sender_name} <{email_user}>"
-    msg["To"] = to_email
-    msg.set_content(content)
+    if not to_email:
+        raise RuntimeError("收件人邮箱为空，无法发送邮件")
 
-    with smtplib.SMTP_SSL(email_host, email_port) as smtp:
+    msg = EmailMessage()
+    msg["Subject"] = str(Header(subject, "utf-8"))
+    msg["From"] = formataddr((str(Header(email_sender_name, "utf-8")), email_user))
+    msg["To"] = to_email
+    msg.set_content(content, charset="utf-8")
+
+    with smtplib.SMTP_SSL(email_host, email_port, timeout=20) as smtp:
         smtp.login(email_user, email_password)
         smtp.send_message(msg)
 
