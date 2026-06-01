@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>多场景个性化健康生活打卡管理系统</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+        .header {
+            background: linear-gradient(135deg, #4f8cff, #35c2a1);
+            color: white;
+            padding: 28px 50px;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logout {
+            text-decoration: none;
+            color: white;
+            background: rgba(255, 255, 255, 0.22);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .logout:hover {
+            background: rgba(255, 255, 255, 0.35);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+        .header p {
+            margin: 10px 0 0;
+            font-size: 15px;
+            opacity: 0.95;
+        }
+        .container {
+            padding: 30px 50px;
+        }
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+        .card-title {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+        .card-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2f6fed;
+        }
+        .section {
+            margin-top: 30px;
+            background: white;
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+        .section h2 {
+            margin-top: 0;
+            font-size: 22px;
+        }
+        .nav {
+            margin-top: 18px;
+        }
+        .nav a {
+            display: inline-block;
+            margin-right: 12px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            background: #eef4ff;
+            color: #2f6fed;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="header-top">
+        <div>
+            <h1>多场景个性化健康生活打卡管理系统</h1>
+            <p>管理员端系统数据总览</p>
+        </div>
+        <a class="logout" href="/logout">退出登录</a>
+    </div>
+</div>
+
+    <div class="container">
+        <div class="cards">
+            <div class="card">
+                <div class="card-title">用户数量</div>
+                <div class="card-value">{{ user_count }}</div>
+            </div>
+            <div class="card">
+                <div class="card-title">打卡类型数量</div>
+                <div class="card-value">{{ type_count }}</div>
+            </div>
+            <div class="card">
+                <div class="card-title">打卡任务数量</div>
+                <div class="card-value">{{ task_count }}</div>
+            </div>
+            <div class="card">
+                <div class="card-title">打卡记录数量</div>
+                <div class="card-value">{{ record_count }}</div>
+            </div>
+            <div class="card">
+                <div class="card-title">异常记录数量</div>
+                <div class="card-value">{{ alert_count }}</div>
+            </div>
+            <div class="card">
+                <div class="card-title">异常通知数量</div>
+                <div class="card-value">{{ notify_count }}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>系统功能</h2>
+            <p>系统支持吃药、报平安、护肤、健身、早睡五类打卡任务，并可根据不同任务类型生成异常提醒。</p>
+            <div class="nav">
+                <a href="/tasks">打卡任务管理</a>
+                <a href="/records">打卡记录查询</a>
+                <a href="/statistics">完成率统计</a>
+                <a href="/alerts">异常提醒管理</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

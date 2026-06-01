@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>创建打卡任务</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+        .header {
+            background: linear-gradient(135deg, #4f8cff, #35c2a1);
+            color: white;
+            padding: 26px 50px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+        .container {
+            padding: 30px 50px;
+        }
+        .panel {
+            max-width: 760px;
+            background: white;
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+        label {
+            display: block;
+            margin-top: 16px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .btn {
+            margin-top: 24px;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            background: #2f6fed;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .back {
+            display: inline-block;
+            margin-left: 12px;
+            text-decoration: none;
+            color: #2f6fed;
+            font-weight: bold;
+            background: #eef4ff;
+            padding: 11px 16px;
+            border-radius: 8px;
+        }
+        .tip {
+            margin-top: 18px;
+            padding: 12px;
+            background: #f0f5ff;
+            border-radius: 8px;
+            color: #555;
+            line-height: 1.7;
+        }
+        .msg {
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #e9f8f0;
+            color: #1f9d55;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>创建打卡任务</h1>
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <h2>{{ username }} 的新任务</h2>
+
+            {% if message %}
+                <div class="msg">{{ message }}</div>
+            {% endif %}
+
+            <form method="post">
+                <label>打卡类型</label>
+                <select name="type_id" required>
+                    {% for t in types %}
+                        <option value="{{ t.type_id }}">
+                            {{ t.type_name }}（连续 {{ t.default_miss_days }} 天未打卡异常）
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <label>任务名称</label>
+                <input type="text" name="task_name" placeholder="例如：晚间护肤打卡、每日早睡打卡" required>
+
+                <div class="row">
+                    <div>
+                        <label>目标打卡时间</label>
+                        <input type="time" name="target_time" required>
+                    </div>
+                    <div>
+                        <label>打卡频率</label>
+                        <input type="text" name="frequency" value="每日" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div>
+                        <label>开始日期</label>
+                        <input type="date" name="start_date" required>
+                    </div>
+                    <div>
+                        <label>结束日期</label>
+                        <input type="date" name="end_date" required>
+                    </div>
+                </div>
+
+                <label>是否开启老人模式</label>
+                <select name="elder_mode">
+                    <option value="0">否</option>
+                    <option value="1">是，仅建议吃药任务使用</option>
+                </select>
+
+                <button class="btn" type="submit">创建任务</button>
+                <a class="back" href="/user/home">返回用户首页</a>
+            </form>
+
+            <div class="tip">
+                说明：系统会根据所选打卡类型自动生成提醒规则。报平安任务默认通知紧急联系人；吃药任务若开启老人模式，异常时也会通知紧急联系人。
+            </div>
+        </div>
+    </div>
+</body>
+</html>

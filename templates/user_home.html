@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>用户端首页</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+        .header {
+            background: linear-gradient(135deg, #4f8cff, #35c2a1);
+            color: white;
+            padding: 30px 50px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+        .header p {
+            margin: 10px 0 0;
+            font-size: 16px;
+        }
+        .container {
+            padding: 32px 50px;
+        }
+        .welcome {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            margin-bottom: 26px;
+        }
+        .welcome h2 {
+            margin-top: 0;
+            color: #2f6fed;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            text-decoration: none;
+            color: #222;
+            transition: 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        .card h3 {
+            margin: 0 0 10px;
+            color: #2f6fed;
+        }
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
+        }
+        .logout {
+            display: inline-block;
+            margin-top: 24px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: #fff0f0;
+            color: #d64545;
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>用户端首页</h1>
+        <p>多场景个性化健康生活打卡管理系统</p>
+    </div>
+
+    <div class="container">
+        <div class="welcome">
+            <h2>欢迎你，{{ username }}！</h2>
+            <p>你可以在这里管理自己的打卡任务、完成今日打卡、查看历史记录和异常提醒。</p>
+            <a class="logout" href="/logout">退出登录</a>
+        </div>
+
+        <div class="grid">
+            <a class="card" href="/user/tasks">
+                <h3>我的打卡任务</h3>
+                <p>查看当前账号创建的所有打卡任务。</p>
+            </a>
+
+            <a class="card" href="/user/create_task">
+                <h3>创建打卡任务</h3>
+                <p>选择吃药、报平安、护肤、健身、早睡等类型创建任务。</p>
+            </a>
+
+            <a class="card" href="/user/records">
+                <h3>我的打卡记录</h3>
+                <p>查看自己的历史打卡记录和完成状态。</p>
+            </a>
+
+            <a class="card" href="/user/statistics">
+                <h3>我的完成率统计</h3>
+                <p>查看各项任务的完成率和未完成次数。</p>
+            </a>
+
+            <a class="card" href="/user/contacts">
+                <h3>紧急联系人管理</h3>
+                <p>维护报平安和老人模式吃药提醒联系人。</p>
+            </a>
+
+            <a class="card" href="/user/alerts">
+                <h3>我的异常提醒</h3>
+                <p>查看自己的未打卡、连续未打卡等异常记录。</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

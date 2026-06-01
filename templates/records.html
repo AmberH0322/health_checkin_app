@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>打卡记录查询</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+        .header {
+            background: linear-gradient(135deg, #4f8cff, #35c2a1);
+            color: white;
+            padding: 26px 50px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+        .container {
+            padding: 30px 50px;
+        }
+        .panel {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .back {
+            text-decoration: none;
+            color: #2f6fed;
+            font-weight: bold;
+            background: #eef4ff;
+            padding: 9px 14px;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th {
+            background: #f0f5ff;
+            color: #333;
+            padding: 11px;
+            text-align: left;
+        }
+        td {
+            padding: 11px;
+            border-bottom: 1px solid #eee;
+        }
+        tr:hover {
+            background: #f9fbff;
+        }
+        .status {
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .done {
+            background: #e9f8f0;
+            color: #1f9d55;
+        }
+        .late {
+            background: #fff6e6;
+            color: #d98200;
+        }
+        .miss {
+            background: #fff0f0;
+            color: #d64545;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>打卡记录查询</h1>
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <div class="top-bar">
+                <h2>用户每日打卡记录</h2>
+                <a class="back" href="/">返回首页</a>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>记录编号</th>
+                        <th>用户名</th>
+                        <th>打卡类型</th>
+                        <th>任务名称</th>
+                        <th>打卡日期</th>
+                        <th>实际打卡时间</th>
+                        <th>打卡状态</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>{{ record.record_id }}</td>
+                        <td>{{ record.username }}</td>
+                        <td>{{ record.type_name }}</td>
+                        <td>{{ record.task_name }}</td>
+                        <td>{{ record.checkin_date }}</td>
+                        <td>
+                            {% if record.checkin_time %}
+                                {{ record.checkin_time }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.checkin_status == '已完成' %}
+                                <span class="status done">已完成</span>
+                            {% elif record.checkin_status == '超时完成' %}
+                                <span class="status late">超时完成</span>
+                            {% else %}
+                                <span class="status miss">未完成</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.remark }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+</html>

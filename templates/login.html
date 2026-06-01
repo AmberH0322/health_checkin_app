@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>用户登录</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: linear-gradient(135deg, #4f8cff, #35c2a1);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-box {
+            width: 380px;
+            background: white;
+            border-radius: 18px;
+            padding: 36px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.16);
+        }
+        h1 {
+            margin: 0 0 10px;
+            text-align: center;
+            color: #2f6fed;
+            font-size: 26px;
+        }
+        .sub-title {
+            text-align: center;
+            color: #666;
+            margin-bottom: 26px;
+        }
+        label {
+            display: block;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #333;
+        }
+        input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: #2f6fed;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #245bd0;
+        }
+        .error {
+            margin-top: 16px;
+            color: #d64545;
+            text-align: center;
+            font-weight: bold;
+        }
+        .tip {
+            margin-top: 18px;
+            font-size: 13px;
+            color: #777;
+            text-align: center;
+            line-height: 1.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>用户登录</h1>
+        <div class="sub-title">多场景个性化健康生活打卡管理系统</div>
+
+        <form method="post">
+            <label>用户名</label>
+            <input type="text" name="username" placeholder="请输入用户名" required>
+
+            <label>密码</label>
+            <input type="password" name="password" placeholder="请输入密码" required>
+
+            <button type="submit">登录</button>
+        </form>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <div class="tip">
+            测试账号：zhangsan / 123456<br>
+            老人模式测试账号：linainai / 123456
+        </div>
+        <div class="tip">
+            还没有账号？<a href="/register" style="color:#2f6fed;font-weight:bold;">点击注册</a>
+        </div>
+    </div>
+</body>
+</html>
