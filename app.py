@@ -10,8 +10,8 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "health_checkin_secret_key")
 
 def get_db_connection():
-    """连接 MySQL 数据库：本地运行用默认值，部署到 Railway 后自动读取环境变量"""
-    return pymysql.connect(
+    """连接 MySQL 数据库：本地运行用默认值，部署到 Railway 后自动读取环境变量，并统一设置为北京时间"""
+    conn = pymysql.connect(
         host=os.getenv("MYSQLHOST", "localhost"),
         port=int(os.getenv("MYSQLPORT", "3306")),
         user=os.getenv("MYSQLUSER", "checkin_user"),
@@ -20,6 +20,12 @@ def get_db_connection():
         charset="utf8mb4",
         cursorclass=pymysql.cursors.DictCursor
     )
+
+    # 设置当前数据库连接的时区为中国标准时间 UTC+8
+    with conn.cursor() as cursor:
+        cursor.execute("SET time_zone = '+08:00';")
+
+    return conn
 
 def send_email(to_email, subject, content):
     """使用 Resend API 发送邮件提醒"""
